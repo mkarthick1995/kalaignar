@@ -16,8 +16,8 @@ from PIL import Image, ImageDraw
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from kalakar import export, ingest, segment, template  # noqa: E402
-from kalakar import layout  # noqa: E402
+from kalaignar import export, ingest, segment, template  # noqa: E402
+from kalaignar import layout  # noqa: E402
 
 FAILURES = 0
 
@@ -100,7 +100,7 @@ def main() -> int:
         feet_zone = alpha[170:192, :]
         check(feet_zone.max() > 60, "render: content reaches the feet baseline")
 
-    print("=== kalakar synthetic test: %s ===" % ("FAILED" if FAILURES else "OK"))
+    print("=== kalaignar synthetic test: %s ===" % ("FAILED" if FAILURES else "OK"))
     return 1 if FAILURES else 0
 
 

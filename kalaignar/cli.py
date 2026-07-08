@@ -1,9 +1,9 @@
-"""Kalakar command line.
+"""Kalaignar command line.
 
-  python -m kalakar template <out.png>
+  python -m kalaignar template <out.png>
       Write the printable parts-sheet template.
 
-  python -m kalakar process <photo> --character bengal_lathi --out <dir>
+  python -m kalaignar process <photo> --character bengal_lathi --out <dir>
       Full pipeline: photo -> warped canvas -> parts -> animation strips.
       Optional: --artist "Name" (ledger credit), --debug (dump stage images).
 """
@@ -19,7 +19,7 @@ from . import export, ingest, segment, template
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(prog="kalakar", description=__doc__)
+    parser = argparse.ArgumentParser(prog="kalaignar", description=__doc__)
     sub = parser.add_subparsers(dest="cmd", required=True)
 
     p_tpl = sub.add_parser("template", help="write the printable parts sheet")

@@ -35,7 +35,7 @@ def export_character(
     ledger = out_dir / "ledger_row.md"
     ledger.write_text(
         f"| `assets/sprites/{character}/**` | Sprites | Hand-drawn by {artist}, "
-        f"processed by Kalakar ({date.today().isoformat()}) | Original — created "
+        f"processed by Kalaignar ({date.today().isoformat()}) | Original — created "
         "for this project, all rights ours | No (deterministic tool, no ML) | "
         "Source drawing + this pipeline |\n",
         encoding="utf-8",

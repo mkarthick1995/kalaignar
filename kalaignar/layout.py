@@ -59,7 +59,7 @@ PARTS = {
 }
 
 INSTRUCTIONS = [
-    "KALAKAR PARTS SHEET v1  -  side view, character faces RIGHT",
+    "KALAIGNAR PARTS SHEET v1  -  side view, character faces RIGHT",
     "Draw each part INSIDE its box with a DARK pen (thick, closed outlines).",
     "Put the marked joint on the small cross. Interiors will be auto-filled.",
     "Photograph flat, all four black corners visible, even light, no shadows.",
