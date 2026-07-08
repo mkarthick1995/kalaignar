@@ -49,4 +49,6 @@ Synthetic end-to-end: draws a fake character onto the template programmatically,
 
 ## Status / roadmap
 
-v0.1 (MVP): template + full pipeline + `bengal_lathi` pose set (7 animations). Next: full 13-animation sets for all 8 fighters (or import poses from the game repo directly), palette/color file, pivot-adjust editor, smear frames.
+v0.2: template + full pipeline + **all 8 fighters, 13 animations each** (104 total), synced from the game repo via `python tools/sync_poses.py` (single source of truth — rerun when the game's poses change). `--game-dir` copies strips straight into the game.
+
+Next: palette/color file, pivot-adjust editor, bendable weapon segments (urumi curvature), smear frames.

@@ -31,6 +31,10 @@ def main(argv: list[str] | None = None) -> int:
     p_proc.add_argument("--out", type=Path, required=True, help="output directory")
     p_proc.add_argument("--artist", default="team", help="credit for the asset ledger")
     p_proc.add_argument("--debug", action="store_true", help="dump intermediate images")
+    p_proc.add_argument(
+        "--game-dir", type=Path, default=None,
+        help="game repo root: also copy strips into assets/sprites/<character>/",
+    )
 
     args = parser.parse_args(argv)
 
@@ -58,4 +62,19 @@ def main(argv: list[str] | None = None) -> int:
     for path in written:
         print(f"  -> {path}")
     print(f"done: {len(written)} files")
+
+    if args.game_dir is not None:
+        import shutil
+
+        target = args.game_dir / "assets" / "sprites" / args.character
+        target.mkdir(parents=True, exist_ok=True)
+        copied = 0
+        for path in written:
+            if "@" in path.name and path.suffix == ".png":
+                shutil.copy2(path, target / path.name)
+                copied += 1
+        print(f"copied {copied} strips -> {target}")
+        print("now run in the game repo:")
+        print("  godot --headless --path . --import")
+        print("  godot --headless --path . -s res://tools/build_sprite_frames.gd")
     return 0

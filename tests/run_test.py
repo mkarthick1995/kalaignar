@@ -100,6 +100,25 @@ def main() -> int:
         feet_zone = alpha[170:192, :]
         check(feet_zone.max() > 60, "render: content reaches the feet baseline")
 
+    # Every fighter's full pose set must render (one frame per animation).
+    from kalaignar.poses import CHARACTER_POSES
+    from kalaignar.render import PuppetRenderer
+
+    check(len(CHARACTER_POSES) == 8, f"poses: 8 characters synced ({len(CHARACTER_POSES)})")
+    renderer = PuppetRenderer(parts)
+    total_anims = 0
+    bad = []
+    for character, anims in CHARACTER_POSES.items():
+        if len(anims) != 13:
+            bad.append(f"{character} has {len(anims)} anims")
+        for anim, (fps, _loop, poses) in anims.items():
+            total_anims += 1
+            frame = renderer.render_frame(poses[0])
+            if int(np.array(frame)[:, :, 3].max()) <= 60:
+                bad.append(f"{character}/{anim} rendered empty")
+    check(not bad, "poses: every animation of every fighter renders (%d checked)%s"
+          % (total_anims, "" if not bad else " — " + "; ".join(bad[:4])))
+
     print("=== kalaignar synthetic test: %s ===" % ("FAILED" if FAILURES else "OK"))
     return 1 if FAILURES else 0
 

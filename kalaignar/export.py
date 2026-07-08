@@ -21,13 +21,14 @@ def export_character(
     renderer = PuppetRenderer(parts)
     written: list[Path] = []
 
-    for anim, (fps, _loop, poses) in CHARACTER_POSES[character]().items():
+    anims = CHARACTER_POSES[character]
+    for anim, (fps, _loop, poses) in anims.items():
         strip = renderer.render_animation(poses)
         path = out_dir / f"{anim}@{len(poses)}x{fps}.png"
         strip.save(path)
         written.append(path)
 
-    portrait = renderer.render_frame(CHARACTER_POSES[character]()["idle"][2][0])
+    portrait = renderer.render_frame(anims["idle"][2][0])
     portrait_path = out_dir / "portrait.png"
     portrait.save(portrait_path)
     written.append(portrait_path)
