@@ -2,7 +2,8 @@
 extract the ink drawing, fill enclosed interiors, output RGBA parts.
 
 Parts render as dark ink + near-white interior so the game's per-player
-body_color modulate can tint them (same convention as the placeholders)."""
+body_color modulate can tint them (same convention as the placeholders).
+An optional palette (palette.py) recolors ink/fill afterwards using `ink`."""
 
 from dataclasses import dataclass
 
@@ -22,6 +23,8 @@ class Part:
     name: str
     rgba: np.ndarray  # (h, w, 4) uint8, tight-cropped
     pivot: tuple[float, float]  # pivot position inside the cropped image
+    ink: np.ndarray  # (h, w) bool — True where the artist's line is
+    origin: tuple[int, int]  # crop's top-left in canonical canvas coordinates
 
 
 def _extract_one(canvas: np.ndarray, name: str) -> Part | None:
@@ -51,8 +54,12 @@ def _extract_one(canvas: np.ndarray, name: str) -> Part | None:
     ys, xs = np.nonzero(alpha)
     y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
     rgba = rgba[y0:y1, x0:x1]
-    pivot_local = (px - bx - BOX_INSET - x0, py - by - BOX_INSET - y0)
-    return Part(name=name, rgba=rgba, pivot=pivot_local)
+    origin = (bx + BOX_INSET + int(x0), by + BOX_INSET + int(y0))
+    pivot_local = (px - origin[0], py - origin[1])
+    return Part(
+        name=name, rgba=rgba, pivot=pivot_local,
+        ink=ink[y0:y1, x0:x1] > 0, origin=origin,
+    )
 
 
 def extract_parts(canvas: np.ndarray) -> dict[str, Part]:

@@ -29,10 +29,10 @@ CHARACTERS = {
 LOOPING = {"idle", "walk", "crouch", "jump"}
 
 ## Pose keys the puppet renderer understands; everything else (shield flags,
-## whip curvature, …) is a stick-generator detail the ARTIST's drawing covers.
+## …) is a stick-generator detail the ARTIST's drawing covers.
 SUPPORTED_KEYS = {
     "hip_y", "lean", "front_arm", "rear_arm", "front_foot", "rear_foot",
-    "staff_angle", "staff_offset", "staff_len", "lying",
+    "staff_angle", "staff_offset", "staff_len", "whip_curve", "lying",
 }
 
 

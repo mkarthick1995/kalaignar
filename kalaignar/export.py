@@ -4,16 +4,19 @@ select-screen portrait, and an asset-ledger row."""
 from datetime import date
 from pathlib import Path
 
+from . import smear as smear_mod
 from .poses import CHARACTER_POSES
 from .render import PuppetRenderer
 from .segment import Part
 
 
 def export_character(
-    parts: dict[str, Part], character: str, out_dir: Path, artist: str = "team"
+    parts: dict[str, Part], character: str, out_dir: Path, artist: str = "team",
+    smear: bool = False,
 ) -> list[Path]:
     """Render every animation for `character` into out_dir. Returns paths.
-    Strip names follow the game convention: <anim>@<frames>x<fps>.png."""
+    Strip names follow the game convention: <anim>@<frames>x<fps>.png.
+    smear: add motion trails to non-looping animations (see smear.py)."""
     if character not in CHARACTER_POSES:
         known = ", ".join(sorted(CHARACTER_POSES))
         raise ValueError(f"unknown character '{character}' (have: {known})")
@@ -22,8 +25,11 @@ def export_character(
     written: list[Path] = []
 
     anims = CHARACTER_POSES[character]
-    for anim, (fps, _loop, poses) in anims.items():
-        strip = renderer.render_animation(poses)
+    for anim, (fps, loop, poses) in anims.items():
+        if smear and not loop:
+            strip = smear_mod.render_animation(renderer, poses)
+        else:
+            strip = renderer.render_animation(poses)
         path = out_dir / f"{anim}@{len(poses)}x{fps}.png"
         strip.save(path)
         written.append(path)

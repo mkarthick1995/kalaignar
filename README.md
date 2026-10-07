@@ -26,7 +26,18 @@ Print it (A4, "actual size"). Draw each body part inside its box with a **dark p
 ```bash
 python -m kalaignar process photo.jpg --character bengal_lathi --out out/ --artist "Your Name"
 ```
-Outputs `anim@FRAMESxFPS.png` strips (the game's convention), a select-screen `portrait.png`, and `ledger_row.md` for the game's asset ledger. Add `--debug` to dump the warped canvas and each extracted part.
+Outputs `anim@FRAMESxFPS.png` strips (the game's convention), a select-screen `portrait.png`, `ledger_row.md` for the game's asset ledger, and `rig.json` (the pivots used). Add `--debug` to dump the warped canvas and each extracted part.
+
+Optional polish:
+
+- **Colors**: `python -m kalaignar palette palette.json` writes a starter file. Set `ink`/`fill` globally or per part, then pass `--palette palette.json`. The game multiplies sprites by each player's `body_color`, so keep fills light if you want that tint to read.
+- **Pivots**: if a joint looks off (an arm hinging mid-bicep, a head floating), fix it visually:
+  ```bash
+  python -m kalaignar pivots photo.jpg --character bengal_lathi --rig rig.json
+  ```
+  Click the joint on each part (`n`/`p` switch parts, `wasd` nudges, `[` `]` and `,` `.` pick the preview animation/frame), `S` saves. Then `process ... --rig rig.json`. Pivots are stored in sheet coordinates, so the rig survives redrawing a part.
+- **Smears**: `--smear` adds fading motion trails to fast strikes (non-looping animations only; frame count and timing unchanged, so hitboxes still line up).
+- **Urumi / whip weapons**: draw the hilt just below the weapon cross and the flexible blade above it; poses with `whip_curve` bend the blade along the game's 8-segment curve, hilt rigid.
 
 **4. Into the game:** copy the strips to `warriors-art/assets/sprites/<character>/`, then in the game repo:
 ```bash
@@ -36,7 +47,7 @@ godot --headless --path . -s res://tools/build_sprite_frames.gd
 
 ## How it works (pipeline stages)
 
-photo → **ingest** (find the black frame, perspective-warp to the canonical canvas, flatten lighting) → **segment** (crop known part boxes, extract ink, flood-fill enclosed interiors, tight-crop with pivot tracking) → **render** (puppet: scale/rotate parts around joints per pose frame, 4× supersampled) → **export** (strips + portrait + ledger row).
+photo → **ingest** (find the black frame, perspective-warp to the canonical canvas, flatten lighting) → **segment** (crop known part boxes, extract ink, flood-fill enclosed interiors, tight-crop with pivot tracking) → **palette / rig** (optional recolor and pivot overrides) → **render** (puppet: scale/rotate parts around joints per pose frame, 4× supersampled; whip blades bend per segment; optional smear trails) → **export** (strips + portrait + ledger row + rig.json).
 
 Poses live in `kalaignar/poses.py`, ported from the game's placeholder generator — geometry matches gameplay, so a Kalaignar character's jab connects exactly where the game's hitboxes expect.
 
@@ -45,10 +56,12 @@ Poses live in `kalaignar/poses.py`, ported from the game's placeholder generator
 ```bash
 python tests/run_test.py
 ```
-Synthetic end-to-end: draws a fake character onto the template programmatically, simulates a tilted photo, and runs the whole pipeline (11 checks).
+Synthetic end-to-end: draws a fake character onto the template programmatically, simulates a tilted photo, and runs the whole pipeline: palette, rig, the pivot editor's logic (headless), rotation accuracy at every angle, whip bending, smears, and the CLI (33 checks).
 
 ## Status / roadmap
 
 v0.2: template + full pipeline + **all 8 fighters, 13 animations each** (104 total), synced from the game repo via `python tools/sync_poses.py` (single source of truth — rerun when the game's poses change). `--game-dir` copies strips straight into the game.
 
-Next: palette/color file, pivot-adjust editor, bendable weapon segments (urumi curvature), smear frames.
+v0.3: palette file, pivot editor + `rig.json`, bendable whip weapons (Kalari's urumi), smear frames. Also fixes a renderer bug where any part rotated more than ~70° (arms held forward, horizontal staffs, spins) rendered fully transparent.
+
+Next: forearm/hand split for more expressive arms, per-character pose overrides.
